@@ -1,0 +1,5 @@
+{
+  "name": " TrustMarket demo",
+  "description": "A trust-first marketplace prototype where product authenticity is verified via AI-generated video workflows before purchase.",
+  "requestFramePermissions": []
+}
