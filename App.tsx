@@ -9,11 +9,13 @@ import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleBasedRoute from './components/RoleBasedRoute';
 import ProductDetailView from './components/ProductDetailView';
 import CheckoutView from './components/CheckoutView';
 import SellerDashboard from './components/SellerDashboard';
 import UserProfile from './components/UserProfile';
 import CustomerCareView from './components/CustomerCareView';
+import Unauthorized from './pages/Unauthorized';
 
 // Wrappers to handle params
 const ProductDetailWrapper: React.FC = () => {
@@ -80,12 +82,12 @@ const App: React.FC = () => {
       } />
 
       <Route path="/dashboard" element={
-        <ProtectedRoute>
+        <RoleBasedRoute allowedRoles={['seller', 'admin']}>
           <SellerDashboard onBack={async () => {
             await logout();
             navigate('/login');
           }} />
-        </ProtectedRoute>
+        </RoleBasedRoute>
       } />
 
       <Route path="/profile" element={
@@ -99,6 +101,9 @@ const App: React.FC = () => {
       } />
 
       <Route path="/support" element={<CustomerCareView onBack={() => navigate('/')} />} />
+
+      {/* Unauthorized access page */}
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
