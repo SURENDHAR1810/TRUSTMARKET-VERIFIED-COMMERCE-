@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 .auth-container {
   max-width: 400px;
@@ -9,4 +7,5 @@
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 /* Additional styles from prompt if needed, but Tailwind handles most */
