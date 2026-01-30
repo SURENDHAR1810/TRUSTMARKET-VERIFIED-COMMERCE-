@@ -56,3 +56,15 @@ export interface Product {
   seller?: Seller;
   reviews?: Review[];
 }
+
+export interface Verification {
+  id: string;
+  productId: string;
+  buyerId: string;
+  sellerId: string;
+  videoUrl?: string;
+  status: 'pending' | 'video_ready' | 'watched' | 'approved' | 'rejected';
+  requestedAt: any;
+  completedAt?: any;
+  updatedAt?: any;
+}
