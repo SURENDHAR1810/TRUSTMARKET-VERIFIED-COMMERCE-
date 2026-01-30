@@ -9,6 +9,7 @@ const SignUp: React.FC = () => {
         password: '',
         confirmPassword: '',
         name: '',
+        role: 'buyer' as 'buyer' | 'seller',
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ const SignUp: React.FC = () => {
         );
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
@@ -146,6 +147,20 @@ const SignUp: React.FC = () => {
                             className="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
                             placeholder="••••••••"
                         />
+                    </div>
+
+                    <div>
+                        <label htmlFor="role" className="block text-sm font-medium text-slate-300 mb-1">I want to</label>
+                        <select
+                            id="role"
+                            name="role"
+                            value={formData.role}
+                            onChange={handleChange}
+                            className="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                        >
+                            <option value="buyer">Buy products (Buyer)</option>
+                            <option value="seller">Sell products (Seller)</option>
+                        </select>
                     </div>
 
                     <button
