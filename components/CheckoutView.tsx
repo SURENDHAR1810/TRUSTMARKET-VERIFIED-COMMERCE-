@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2, CreditCard, Lock, Truck } from 'lucide-react';
 import { Product } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { verificationService } from '../services/verificationService';
 import Footer from './Footer';
 
 interface CheckoutViewProps {
@@ -21,6 +23,29 @@ const CheckoutView: React.FC<CheckoutViewProps> = ({ product, onBack, onSuccess,
       zipCode: ''
    });
    const [errors, setErrors] = useState<Record<string, string>>({});
+
+   // Verification Check
+   const { user } = useAuth();
+   const [isVerifying, setIsVerifying] = useState(true);
+   const [isApproved, setIsApproved] = useState(false);
+
+   // Check verification status on mount
+   React.useEffect(() => {
+      const checkVer = async () => {
+         if (user?.uid && product.id) {
+            const ver = await verificationService.findVerification(product.id, user.uid);
+            if (ver && ver.status === 'approved') {
+               setIsApproved(true);
+            } else {
+               // Not approved or doesn't exist - should ideally redirect
+               // For now, we'll set approved to false and handle in UI
+               setIsApproved(false);
+            }
+         }
+         setIsVerifying(false);
+      };
+      checkVer();
+   }, [user, product.id]);
 
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
@@ -57,6 +82,31 @@ const CheckoutView: React.FC<CheckoutViewProps> = ({ product, onBack, onSuccess,
          setTimeout(onSuccess, 3000);
       }, 2000);
    };
+
+   if (isVerifying) {
+      return (
+         <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+         </div>
+      );
+   }
+
+   if (!isApproved) {
+      return (
+         <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
+            <div className="bg-[#1e293b] p-8 rounded-2xl border border-slate-700 max-w-md text-center">
+               <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Lock className="w-8 h-8 text-amber-500" />
+               </div>
+               <h2 className="text-2xl font-bold text-white mb-2">Verification Required</h2>
+               <p className="text-slate-400 mb-8">You must watch and approve the live packing video before you can checkout this item.</p>
+               <button onClick={onBack} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition-all">
+                  Back to Product
+               </button>
+            </div>
+         </div>
+      );
+   }
 
    if (step === 2) {
       return (
