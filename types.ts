@@ -39,6 +39,7 @@ export interface Seller {
 
 export interface Product {
   id: string;
+  sellerId: string;
   name: string;
   description: string;
   features: string[];
@@ -46,7 +47,12 @@ export interface Product {
   category: 'Electronics' | 'Fashion' | 'Home' | 'Accessories' | 'Beauty' | 'Sports' | 'Automotive';
   imageUrl: string;
   images: string[];
-  staticVideoUrl: string; // New: Standard product video
-  seller: Seller;
-  reviews: Review[];
+  staticVideoUrl: string;
+  isVerifiedSeller?: boolean;
+  status: 'active' | 'pending' | 'sold';
+  createdAt?: any;
+  updatedAt?: any;
+  // UI-specific properties (can be populated after fetch)
+  seller?: Seller;
+  reviews?: Review[];
 }
