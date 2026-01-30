@@ -68,3 +68,22 @@ export interface Verification {
   completedAt?: any;
   updatedAt?: any;
 }
+
+export interface Order {
+  id: string;
+  productId: string;
+  buyerId: string;
+  sellerId: string;
+  productName: string;
+  productPrice: number;
+  status: 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  shippingAddress: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    zipCode: string;
+  };
+  createdAt: any;
+  updatedAt: any;
+}

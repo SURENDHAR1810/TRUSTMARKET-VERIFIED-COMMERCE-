@@ -3,6 +3,7 @@ import { ArrowLeft, CheckCircle2, CreditCard, Lock, Truck } from 'lucide-react';
 import { Product } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { verificationService } from '../services/verificationService';
+import { orderService } from '../services/orderService';
 import Footer from './Footer';
 
 interface CheckoutViewProps {
@@ -72,15 +73,33 @@ const CheckoutView: React.FC<CheckoutViewProps> = ({ product, onBack, onSuccess,
       return Object.keys(newErrors).length === 0;
    };
 
-   const handlePlaceOrder = () => {
-      if (!validateForm()) return;
+   const handlePlaceOrder = async () => {
+      if (!validateForm() || !user) return;
 
       setLoading(true);
-      setTimeout(() => {
+      try {
+         // 1. Create order in Firestore
+         await orderService.createOrder({
+            productId: product.id,
+            buyerId: user.uid,
+            sellerId: product.sellerId,
+            productName: product.name,
+            productPrice: product.price,
+            shippingAddress: { ...formData },
+            status: 'processing'
+         });
+
+         // 2. Simulated payment delay
+         setTimeout(() => {
+            setLoading(false);
+            setStep(2);
+            setTimeout(onSuccess, 3000);
+         }, 1500);
+      } catch (error) {
+         console.error("Error placing order:", error);
+         alert("Failed to place order. Please try again.");
          setLoading(false);
-         setStep(2);
-         setTimeout(onSuccess, 3000);
-      }, 2000);
+      }
    };
 
    if (isVerifying) {
