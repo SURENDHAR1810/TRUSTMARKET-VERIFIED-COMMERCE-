@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardByRole } from '../utils/roleUtils';
 import { LogIn } from 'lucide-react';
 
 const SignIn: React.FC = () => {
@@ -8,7 +9,7 @@ const SignIn: React.FC = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login, isAuthenticated, loading: authLoading } = useAuth();
+    const { login, isAuthenticated, userData, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -17,9 +18,10 @@ const SignIn: React.FC = () => {
     // Redirect if already authenticated
     useEffect(() => {
         if (!authLoading && isAuthenticated) {
-            navigate(from, { replace: true });
+            const destination = from === '/' ? getDashboardByRole(userData?.role || 'buyer') : from;
+            navigate(destination, { replace: true });
         }
-    }, [isAuthenticated, authLoading, navigate, from]);
+    }, [isAuthenticated, authLoading, navigate, from, userData]);
 
     // Show loading while checking auth state
     if (authLoading) {
@@ -36,8 +38,13 @@ const SignIn: React.FC = () => {
         setLoading(true);
 
         try {
-            await login(email, password);
-            navigate(from, { replace: true });
+            const userCredential = await login(email, password);
+            // Fetch role if not yet in context (though login usually resolves after auth state change)
+            // But we can just rely on the navigate logic if we wait for auth context top-level update
+            // However, it's safer to just navigate to the role dashboard if 'from' is root
+            const destination = from === '/' ? '/' : from;
+            // the useEffect will handle the precise role redirect once state updates
+            navigate(destination, { replace: true });
         } catch (err: any) {
             console.error('Login error:', err);
             switch (err.code) {

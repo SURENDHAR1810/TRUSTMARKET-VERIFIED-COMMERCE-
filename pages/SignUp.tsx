@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardByRole } from '../utils/roleUtils';
 import { UserPlus } from 'lucide-react';
 
 const SignUp: React.FC = () => {
@@ -13,15 +14,15 @@ const SignUp: React.FC = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signup, isAuthenticated, loading: authLoading } = useAuth();
+    const { signup, isAuthenticated, userData, loading: authLoading } = useAuth();
     const navigate = useNavigate();
 
     // Redirect if already authenticated
     useEffect(() => {
         if (!authLoading && isAuthenticated) {
-            navigate('/', { replace: true });
+            navigate(getDashboardByRole(userData?.role || 'buyer'), { replace: true });
         }
-    }, [isAuthenticated, authLoading, navigate]);
+    }, [isAuthenticated, authLoading, navigate, userData]);
 
     // Show loading while checking auth state
     if (authLoading) {
@@ -52,7 +53,8 @@ const SignUp: React.FC = () => {
         try {
             const { email, password, confirmPassword, ...additionalData } = formData;
             await signup(email, password, additionalData);
-            navigate('/');
+            // Redirect to role-appropriate dashboard
+            navigate(getDashboardByRole(formData.role), { replace: true });
         } catch (err: any) {
             console.error('Signup error:', err);
             switch (err.code) {
